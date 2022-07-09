@@ -5,10 +5,10 @@ import json
 
 url = 'https://www.google.com/search'
 
-root = '//div[@class="g"]|//div[@class="g tF2Cxc"]'
+root = '//div[@class="g"]|//div[@class="g tF2Cxc"]|//div[@class="g Ww4FFb tF2Cxc"]'
 a = './/div[@class="yuRUbf"]/a'
 title = './/h3[1]'
-snip = './/div[@class="IsZvec"]'
+snip = './/div[@data-content-feature="1"]|.//div[@class="VwiC3b yXK7lf MUxGbd yDYNvb lyLwlc lEBKkf"]'
 cite = './/div[@class="yuRUbf"]/a//cite'
 
 pager = lambda x: (x - 1) * count
@@ -41,6 +41,7 @@ while True:
 			req = requests.get(redirect, headers=headers)
 
 		_pages += req.text
+		open('test.html','w').write(_pages)
 		page += 1
 		params['start'] = pager(page)
 		if page >= limit:
@@ -55,8 +56,11 @@ for i in results:
 	link = i.xpath(a)
 	result['href'] = link[0].get('href')
 	result['title'] = link[0].xpath(title)[0].text_content().strip()
-	result['content'] = i.xpath(snip)[0].text_content().strip()
-	result['cite'] = i.xpath(cite)[0].text_content().strip()
+	if i is not None:
+		if i.xpath(snip):
+			result['content'] = i.xpath(snip)[0].text_content().strip()
+		if i.xpath(cite):
+			result['cite'] = i.xpath(cite)[0].text_content().strip()
 	outcome.append(result)
 	print(result)
 	print('\n')
